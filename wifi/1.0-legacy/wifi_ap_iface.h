@@ -20,14 +20,13 @@
 #include <android-base/macros.h>
 #include <android/hardware/wifi/1.0/IWifiApIface.h>
 
-#include "wifi_feature_flags.h"
 #include "wifi_iface_util.h"
 #include "wifi_legacy_hal.h"
 
 namespace android {
 namespace hardware {
 namespace wifi {
-namespace V1_3 {
+namespace V1_4 {
 namespace implementation {
 using namespace android::hardware::wifi::V1_0;
 
@@ -36,11 +35,9 @@ using namespace android::hardware::wifi::V1_0;
  */
 class WifiApIface : public V1_0::IWifiApIface {
    public:
-    WifiApIface(
-        const std::string& ifname,
-        const std::weak_ptr<legacy_hal::WifiLegacyHal> legacy_hal,
-        const std::weak_ptr<iface_util::WifiIfaceUtil> iface_util,
-        const std::weak_ptr<feature_flags::WifiFeatureFlags> feature_flags);
+    WifiApIface(const std::string& ifname,
+                const std::weak_ptr<legacy_hal::WifiLegacyHal> legacy_hal,
+                const std::weak_ptr<iface_util::WifiIfaceUtil> iface_util);
     // Refer to |WifiChip::invalidate()|.
     void invalidate();
     bool isValid();
@@ -52,7 +49,8 @@ class WifiApIface : public V1_0::IWifiApIface {
     Return<void> setCountryCode(const hidl_array<int8_t, 2>& code,
                                 setCountryCode_cb hidl_status_cb) override;
     Return<void> getValidFrequenciesForBand(
-        WifiBand band, getValidFrequenciesForBand_cb hidl_status_cb) override;
+        V1_0::WifiBand band,
+        getValidFrequenciesForBand_cb hidl_status_cb) override;
 
    private:
     // Corresponding worker functions for the HIDL methods.
@@ -60,19 +58,18 @@ class WifiApIface : public V1_0::IWifiApIface {
     std::pair<WifiStatus, IfaceType> getTypeInternal();
     WifiStatus setCountryCodeInternal(const std::array<int8_t, 2>& code);
     std::pair<WifiStatus, std::vector<WifiChannelInMhz>>
-    getValidFrequenciesForBandInternal(WifiBand band);
+    getValidFrequenciesForBandInternal(V1_0::WifiBand band);
 
     std::string ifname_;
     std::weak_ptr<legacy_hal::WifiLegacyHal> legacy_hal_;
     std::weak_ptr<iface_util::WifiIfaceUtil> iface_util_;
-    std::weak_ptr<feature_flags::WifiFeatureFlags> feature_flags_;
     bool is_valid_;
 
     DISALLOW_COPY_AND_ASSIGN(WifiApIface);
 };
 
 }  // namespace implementation
-}  // namespace V1_3
+}  // namespace V1_4
 }  // namespace wifi
 }  // namespace hardware
 }  // namespace android
